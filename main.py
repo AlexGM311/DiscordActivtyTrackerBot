@@ -1,4 +1,6 @@
 import asyncio
+from os import getenv
+
 import dotenv
 import os
 from datetime import datetime as dt, timedelta
@@ -100,8 +102,8 @@ def close_all_sessions() -> None:
 async def start_uvicorn():
     config = uvicorn.Config(
         "api:app",
-        host="0.0.0.0",
-        port=8001,
+        host=getenv("HOST"),
+        port=int(getenv("PORT")),
         log_level="debug",
         reload=False,
         access_log=True
