@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from os import getenv
 
 import dotenv
@@ -14,7 +15,31 @@ import atexit
 
 dotenv.load_dotenv()
 
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s",
+        },
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": f"{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.log",
+            "formatter": "default",
+        }
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["file"], "level": "INFO"},
+        "uvicorn.error": {"handlers": ["file"], "level": "INFO"},
+        "uvicorn.access": {"handlers": ["file"], "level": "INFO"},
+    },
+}
+
 logging.basicConfig(
+    filename=f"{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.log",
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -100,15 +125,16 @@ def close_all_sessions() -> None:
 
 
 async def start_uvicorn():
-    config = uvicorn.Config(
+    cfg = uvicorn.Config(
         "api:app",
         host=getenv("HOST"),
         port=int(getenv("PORT")),
         log_level="debug",
         reload=False,
-        access_log=True
+        access_log=True,
+        log_config=LOG_CONFIG
     )
-    server = uvicorn.Server(config)
+    server = uvicorn.Server(cfg)
     await server.serve()
 
 

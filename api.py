@@ -8,10 +8,7 @@ import hashlib
 from os import getenv
 import fastapi
 
-# Configure logging
 logger = logging.getLogger("app")
-logging.getLogger("app").setLevel(logging.DEBUG)
-
 
 from fastapi import FastAPI, HTTPException, Query, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
