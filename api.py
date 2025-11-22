@@ -376,34 +376,4 @@ async def login(request: Request):
 # Run with: uvicorn api:app --host 0.0.0.0 --port 8001 --reload --log-level debug --access-log
 
 if __name__ == "__main__":
-        db = next(get_db())
-        eventsT: List[Event] = db.query(Event).order_by(Event.timestamp).all()
-        def is_afk(channel: Channel | None) -> bool:
-            return channel.is_afk if channel else False
-        line_events = []  # (timestamp, delta)
-        for e in eventsT:
-            if e.prevChannel == -1 or e.nextChannel == -1:
-                continue
-            if e.user.is_bot:
-                continue
 
-            prev = e.previous_channel
-            nxt = e.next_channel
-
-            prev_afk = is_afk(prev)
-            next_afk = is_afk(nxt)
-
-            # OPEN: from None or AFK → non-AFK
-            if (prev is None or prev_afk) and (nxt is not None and not next_afk):
-                line_events.append((e, +1))
-                continue
-
-            # CLOSE: from non-AFK → None or AFK
-            if (prev is not None and not prev_afk) and (nxt is None or next_afk):
-                line_events.append((e, -1))
-                continue
-        total = 0
-        with open("test.txt", "w") as file:
-            for e in line_events:
-                total += e[1]
-                file.write(f"({e[0].id}): {e[0].timestamp.isoformat()} -- {e[1]} : {total};\n")

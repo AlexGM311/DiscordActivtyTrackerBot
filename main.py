@@ -1,8 +1,10 @@
+import asyncio
 import dotenv
 import os
 from datetime import datetime as dt, timedelta
 from asyncio import sleep
 import logging
+import uvicorn
 from discord import Member, VoiceState
 from db import *
 from models import *
@@ -15,15 +17,12 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
-active_users = 0
-
 intents = discord.Intents.default()
 intents.voice_states = True
 intents.members = True
-
 client = discord.Client(intents=intents)
-
+TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
+active_users = 0
 
 @client.event
 async def on_ready():
@@ -91,11 +90,31 @@ async def on_voice_state_update(member: Member, before: VoiceState, after: Voice
     logging.info(f"👶 Активно {active_users} пользователей")
 
 
-client.run(TOKEN_DISCORD)
-
 @atexit.register
 def close_all_sessions() -> None:
     unclosed_users: list[User] = get_active_users()
     for user in unclosed_users:
         add(Event(user.latest_event.next_channel, None, user))
 
+
+async def start_uvicorn():
+    config = uvicorn.Config(
+        "api:app",
+        host="0.0.0.0",
+        port=8001,
+        log_level="debug",
+        reload=False,
+        access_log=True
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+async def main():
+    await asyncio.gather(
+        client.start(TOKEN_DISCORD),
+        start_uvicorn()
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
