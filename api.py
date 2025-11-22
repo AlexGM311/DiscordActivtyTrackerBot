@@ -374,6 +374,3 @@ async def login(request: Request):
 
 
 # Run with: uvicorn api:app --host 0.0.0.0 --port 8001 --reload --log-level debug --access-log
-
-if __name__ == "__main__":
-
