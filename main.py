@@ -39,7 +39,7 @@ LOG_CONFIG = {
 }
 
 logging.basicConfig(
-    filename=f"{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.log",
+    filename=LOG_CONFIG["handlers"]["file"]["filename"],
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -140,7 +140,7 @@ async def start_uvicorn():
 
 async def main():
     await asyncio.gather(
-        client.start(TOKEN_DISCORD),
+        # client.start(TOKEN_DISCORD),
         start_uvicorn()
     )
 

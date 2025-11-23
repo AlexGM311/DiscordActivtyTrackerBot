@@ -357,6 +357,16 @@ async def health_check():
     logger.info("healthy")
     return {"status": "healthy"}
 
+@app.get("/api/logs")
+async def logs(auth=fastapi.Depends(require_auth)):
+    from main import LOG_CONFIG
+    try:
+        with open(LOG_CONFIG["handlers"]["file"]["filename"], "r") as file:
+            return {"logs": file.readlines()}
+    except Exception:
+        logger.exception("Unhandled error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 @app.post("/api/login")
 async def login(request: Request):
     data = await request.json()
