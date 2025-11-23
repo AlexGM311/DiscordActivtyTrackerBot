@@ -6,6 +6,8 @@ from itertools import count
 from math import ceil
 import hashlib
 from os import getenv
+from pathlib import Path
+
 import fastapi
 
 logger = logging.getLogger("app")
@@ -361,8 +363,13 @@ async def health_check():
 async def logs(auth=fastapi.Depends(require_auth)):
     from main import LOG_CONFIG
     try:
-        with open(LOG_CONFIG["handlers"]["file"]["filename"], "r") as file:
-            return {"logs": file.readlines()}
+        folder = Path(__file__).parent
+        data = {}
+        for p in folder.glob("*.log"):
+            if p.is_file():
+                with open(p, 'r') as file:
+                    data[p.name] = file.readlines()
+        return data
     except Exception:
         logger.exception("Unhandled error")
         raise HTTPException(status_code=500, detail="Internal server error")
