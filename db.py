@@ -1,3 +1,4 @@
+from api import logger
 from models import *
 from sqlalchemy import create_engine, func, and_, desc, select
 from sqlalchemy.orm import sessionmaker, Session
@@ -22,14 +23,18 @@ def get_channel(channel_id: int) -> Channel | None:
 
 def add(obj: Base) -> None:
     global session
-    stack = inspect.stack()
-    caller_frame = stack[1]
-    filename = caller_frame.filename
-    line_number = caller_frame.lineno
-    function_name = caller_frame.function
-    print(f"Creation of a {obj.__repr__()} object at {filename} line {line_number} function {function_name}")
-    session.add(obj)
-    session.commit()
+    # stack = inspect.stack()
+    # caller_frame = stack[1]
+    # filename = caller_frame.filename
+    # line_number = caller_frame.lineno
+    # function_name = caller_frame.function
+    # print(f"Creation of a {obj.__repr__()} object at {filename} line {line_number} function {function_name}")
+    try:
+        session.add(obj)
+        session.commit()
+    except Exception:
+        rollback()
+        logger.exception("Unhandled exception")
 
 def rollback() -> None:
     session.rollback()

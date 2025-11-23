@@ -111,7 +111,13 @@ def get_total_events(db, user_handle: str) -> int:
 async def get_users(auth=fastapi.Depends(require_auth)):
     db = next(get_db())
     try:
-        users = db.query(User).all()
+        try:
+            users = db.query(User).all()
+        except Exception as e:
+            rollback()
+            e.add_note("Rolled back")
+            raise e
+
         user_models = []
 
         for user in users:
@@ -163,7 +169,13 @@ async def get_activity_data_for_month(year: int, month: int, auth=fastapi.Depend
             current_date += datetime.timedelta(days=1)
 
         # Get all users
-        users = db.query(User).all()
+        try:
+            users = db.query(User).all()
+        except Exception as e:
+            rollback()
+            e.add_note("Rolled back")
+            raise e
+
         user_handles = [user.handle for user in users]
         active = set()
 
@@ -243,22 +255,27 @@ async def get_activity_graph_data(
         # 1. Fetch all events + their channels\
         db = next(get_db())
 
-        if start_dt and end_dt:
-        # noinspection PyTypeChecker
-            events: List[Event] = db.query(Event).where(Event.id>3941,
-                                                        Event.timestamp >= start_dt,
-                                                        Event.timestamp <= end_dt).all()
-        elif start_dt:
-        # noinspection PyTypeChecker
-            events: List[Event] = db.query(Event).where(Event.id>3941,
-                                                        Event.timestamp >= start_dt).all()
-        elif end_dt:
-        # noinspection PyTypeChecker
-            events: List[Event] = db.query(Event).where(Event.id>3941,
-                                                        Event.timestamp <= end_dt).all()
-        else:
-        # noinspection PyTypeChecker
-            events: List[Event] = db.query(Event).where(Event.id>3941).all()
+        try:
+            if start_dt and end_dt:
+            # noinspection PyTypeChecker
+                events: List[Event] = db.query(Event).where(Event.id>3941,
+                                                            Event.timestamp >= start_dt,
+                                                            Event.timestamp <= end_dt).all()
+            elif start_dt:
+            # noinspection PyTypeChecker
+                events: List[Event] = db.query(Event).where(Event.id>3941,
+                                                            Event.timestamp >= start_dt).all()
+            elif end_dt:
+            # noinspection PyTypeChecker
+                events: List[Event] = db.query(Event).where(Event.id>3941,
+                                                            Event.timestamp <= end_dt).all()
+            else:
+            # noinspection PyTypeChecker
+                events: List[Event] = db.query(Event).where(Event.id>3941).all()
+        except Exception as e:
+            rollback()
+            e.add_note("Rolled back")
+            raise e
 
         if not events:
             return []
@@ -361,7 +378,6 @@ async def health_check():
 
 @app.get("/api/logs")
 async def logs(auth=fastapi.Depends(require_auth)):
-    from main import LOG_CONFIG
     try:
         folder = Path(__file__).parent
         data = {}
@@ -378,7 +394,6 @@ async def logs(auth=fastapi.Depends(require_auth)):
 async def login(request: Request):
     data = await request.json()
     password = data.get("password")
-    logger.info(f"Trying to access, p: {password}, md5: {hashlib.md5(password.encode()).hexdigest()}")
     if hashlib.md5(password.encode()).hexdigest() == getenv("MD5_PASSWORD"):
         token = secrets.token_hex(32)
         active_tokens.add(token)
