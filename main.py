@@ -15,6 +15,7 @@ import atexit
 
 dotenv.load_dotenv()
 
+log_filename = f"{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}"
 
 LOG_CONFIG = {
     "version": 1,
@@ -27,7 +28,7 @@ LOG_CONFIG = {
     "handlers": {
         "file": {
             "class": "logging.FileHandler",
-            "filename": f"{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.log",
+            "filename": log_filename+"+uvi.log",
             "formatter": "default",
         }
     },
@@ -39,7 +40,7 @@ LOG_CONFIG = {
 }
 
 logging.basicConfig(
-    filename=LOG_CONFIG["handlers"]["file"]["filename"],
+    filename=log_filename+"+dis.log",
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
