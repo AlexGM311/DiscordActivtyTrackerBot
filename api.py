@@ -25,11 +25,6 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 active_tokens = set()
 
 # Pydantic Models (matching TypeScript interfaces)
