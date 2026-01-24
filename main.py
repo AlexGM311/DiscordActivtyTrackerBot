@@ -141,7 +141,7 @@ async def start_uvicorn():
 
 async def main():
     await asyncio.gather(
-        # client.start(TOKEN_DISCORD),
+        client.start(TOKEN_DISCORD),
         start_uvicorn()
     )
 
