@@ -28,7 +28,7 @@ LOG_CONFIG = {
     "handlers": {
         "file": {
             "class": "logging.FileHandler",
-            "filename": log_filename+"+uvi.log",
+            "filename": "logs/"+log_filename+"+uvi.log",
             "formatter": "default",
         }
     },
