@@ -40,7 +40,7 @@ LOG_CONFIG = {
 }
 
 logging.basicConfig(
-    filename=log_filename+"+dis.log",
+    filename="logs/"+log_filename+"+dis.log",
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
