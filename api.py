@@ -14,7 +14,7 @@ logger = logging.getLogger("app")
 
 from fastapi import FastAPI, HTTPException, Query, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from db import *
 import datetime
 from typing import List, Dict, Optional
@@ -110,6 +110,7 @@ async def get_users(auth=fastapi.Depends(require_auth)):
     try:
         try:
             users = db.query(User).all()
+            logger.info(f"Users: {len(users)}")
         except Exception as e:
             rollback()
             e.add_note("Rolled back")
