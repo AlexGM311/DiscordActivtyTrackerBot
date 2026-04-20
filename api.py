@@ -74,7 +74,7 @@ async def require_auth(x_auth: str = Header(None)):
 
 # Dependency to get DB session
 def get_db():
-    db = s()
+    db = session
     try:
         yield db
     finally:
