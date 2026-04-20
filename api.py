@@ -21,6 +21,7 @@ from typing import List, Dict, Optional
 from pydantic import BaseModel, RootModel
 import os
 from dotenv import load_dotenv
+from models import *
 
 # Load environment variables
 load_dotenv()
