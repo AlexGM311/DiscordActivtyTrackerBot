@@ -110,7 +110,6 @@ async def get_users(auth=fastapi.Depends(require_auth)):
     try:
         try:
             users = db.query(User).all()
-            logger.info(f"Users: {len(users)}")
         except Exception as e:
             rollback()
             e.add_note("Rolled back")
